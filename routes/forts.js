@@ -36,12 +36,14 @@ fortsRouter.route('/')
         console.log(err);
         return;
       };
-      var fort = { ...req.body };
-      console.log(fort)
+      var fort = req.body;
+  
       var collection = db.collection('forts');
       collection.insert(fort,
         function (err, results) {
-          res.send(results);
+          console.log(results.insertedIds)
+         // res.send(results.insertedIds);
+          res.send("update is successful "+ results.insertedIds)
           db.close();
         });
     });
@@ -80,7 +82,8 @@ fortsRouter.route('/')
       // } else {
       collection.find({}).toArray(
         function (err, results) {
-          let resp = removeEmptySpace(results)
+          console.log(results)
+          let resp =results
           res.json(resp);
           db.close();
         });
@@ -120,19 +123,14 @@ fortsRouter.route('/:id')
         return;
       };
       var collection = db.collection('forts');
-      var fort = { fortImage_url: req.body.fortImage_url, fortName: req.body.fortName, fortPlace: req.body.fortPlace, fortConstructedYear: req.body.fortConstructedYear };
+      var fort = req.body;
+      
+      collection.update({'_id': Id}, { $set: fort }, function(err, result) { 
+        if(err) { throw err; }
+        res.send('updated');
+        db.close(); 
+      }); 
 
-      collection.findOne({ '_id': Id },
-        function (err, results) {
-          results.fortImage_url = req.body.fortImage_url,
-            results.fortName = req.body.fortName,
-            results.fortPlace = req.body.fortPlace,
-            results.fortConstructedYear = req.body.fortConstructedYear,
-            results.save();
-          res.json(results);
-          db.close();
-        }
-      );
     });
   })
   //delete method
